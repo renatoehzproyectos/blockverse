@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BlockVerse - Create & Play Games</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            overflow-x: hidden;
+        }
+
+        .navbar {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            backdrop-filter: blur(10px);
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: bold;
+            background: linear-gradient(45deg, #ffd89b, #19547b);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .nav-buttons button {
+            margin-left: 1rem;
+            padding: 0.6rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .nav-buttons button:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .hero {
+            text-align: center;
+            padding: 3rem 0;
+        }
+
+        .hero h1 {
+            font-size: 3.5rem;
+            margin-bottom: 1rem;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .hero p {
+            font-size: 1.3rem;
+            opacity: 0.9;
+            margin-bottom: 2rem;
+        }
+
+        .cta-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+        }
+
+        .cta-buttons button {
+            padding: 1rem 2.5rem;
+            font-size: 1.1rem;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+
+        .primary-btn {
+            background: linear-gradient(45deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+        }
+
+        .secondary-btn {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 2px solid white;
+        }
+
+        .cta-buttons button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+        }
+
+        .studio-container {
+            display: none;
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 15px;
+            padding: 2rem;
+            margin-top: 2rem;
+        }
+
+        .studio-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .studio-header h2 {
+            font-size: 2rem;
+        }
+
+        .studio-content {
+            display: grid;
+            grid-template-columns: 250px 1fr;
+            gap: 1rem;
+            height: 600px;
+        }
+
+        .toolbox {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            padding: 1rem;
+            overflow-y: auto;
+        }
+
+        .tool-section {
+            margin-bottom: 1.5rem;
+        }
+
+        .tool-section h3 {
+            font-size: 1.1rem;
+            margin-bottom: 0.8rem;
+            color: #ffd89b;
+        }
+
+        .tool-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 0.5rem;
+        }
+
+        .tool-btn {
+            padding: 0.8rem;
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid transparent;
+            border-radius: 8px;
+            color: white;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 0.9rem;
+        }
+
+        .tool-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            border-color: #ffd89b;
+        }
+
+        .tool-btn.active {
+            background: rgba(255, 215, 0, 0.3);
+            border-color: gold;
+        }
+
+        .viewport {
+            background: #1a1a2e;
+            border-radius: 10px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        #gameCanvas {
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+
+        .controls-hint {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 1rem;
+            border-radius: 8px;
+            font-size: 0.9rem;
+        }
+
+        .games-grid {
+            display: none;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .game-card {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 12px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .game-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+        }
+
+        .game-thumbnail {
+            width: 100%;
+            height: 180px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+        }
+
+        .game-info {
+            padding: 1rem;
+        }
+
+        .game-title {
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+
+        .game-stats {
+            display: flex;
+            gap: 1rem;
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+
+        .color-picker {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+        }
+
+        .color-option {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            border: 2px solid transparent;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .color-option:hover {
+            border-color: white;
+            transform: scale(1.1);
+        }
+
+        .color-option.active {
+            border-color: gold;
+            box-shadow: 0 0 10px gold;
+        }
+
+        .play-button {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            padding: 0.8rem 2rem;
+            background: linear-gradient(45deg, #11998e 0%, #38ef7d 100%);
+            border: none;
+            border-radius: 8px;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+
+        .play-button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(56, 239, 125, 0.4);
+        }
+
+        .save-button {
+            padding: 0.8rem 2rem;
+            background: linear-gradient(45deg, #f093fb 0%, #f5576c 100%);
+            border: none;
+            border-radius: 8px;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .save-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(245, 87, 108, 0.4);
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="logo">🎮 BlockVerse</div>
+        <div class="nav-buttons">
+            <button onclick="showGames()">Games</button>
+            <button onclick="showStudio()">Studio</button>
+            <button onclick="alert('Account system coming soon!')">Sign In</button>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="hero" id="heroSection">
+            <h1>Create. Play. Share.</h1>
+            <p>Build amazing 3D games in your browser - no downloads required!</p>
+            <div class="cta-buttons">
+                <button class="primary-btn" onclick="showStudio()">🚀 Start Creating</button>
+                <button class="secondary-btn" onclick="showGames()">🎯 Play Games</button>
+            </div>
+        </div>
+
+        <div class="studio-container" id="studioContainer">
+            <div class="studio-header">
+                <h2>🛠️ BlockVerse Studio</h2>
+                <div>
+                    <button class="save-button" onclick="saveGame()">💾 Save Game</button>
+                    <button class="save-button" onclick="showHome()" style="background: rgba(255,255,255,0.2); margin-left: 1rem;">← Back</button>
+                </div>
+            </div>
+            <div class="studio-content">
+                <div class="toolbox">
+                    <div class="tool-section">
+                        <h3>🎨 Blocks</h3>
+                        <div class="tool-grid">
+                            <button class="tool-btn active" onclick="selectTool('cube')">📦 Cube</button>
+                            <button class="tool-btn" onclick="selectTool('sphere')">⚽ Sphere</button>
+                            <button class="tool-btn" onclick="selectTool('cylinder')">🥫 Cylinder</button>
+                            <button class="tool-btn" onclick="selectTool('delete')">🗑️ Delete</button>
+                        </div>
+                    </div>
+
+                    <div class="tool-section">
+                        <h3>🎨 Colors</h3>
+                        <div class="color-picker">
+                            <div class="color-option active" style="background: #ff6b6b;" onclick="selectColor('#ff6b6b')"></div>
+                            <div class="color-option" style="background: #4ecdc4;" onclick="selectColor('#4ecdc4')"></div>
+                            <div class="color-option" style="background: #45b7d1;" onclick="selectColor('#45b7d1')"></div>
+                            <div class="color-option" style="background: #f9ca24;" onclick="selectColor('#f9ca24')"></div>
+                            <div class="color-option" style="background: #6c5ce7;" onclick="selectColor('#6c5ce7')"></div>
+                            <div class="color-option" style="background: #a29bfe;" onclick="selectColor('#a29bfe')"></div>
+                            <div class="color-option" style="background: #fd79a8;" onclick="selectColor('#fd79a8')"></div>
+                            <div class="color-option" style="background: #00b894;" onclick="selectColor('#00b894')"></div>
+                        </div>
+                    </div>
+
+                    <div class="tool-section">
+                        <h3>⚙️ Properties</h3>
+                        <label style="display: block; margin-bottom: 0.5rem;">
+                            Size: <span id="sizeValue">1</span>
+                        </label>
+                        <input type="range" min="0.5" max="3" step="0.5" value="1" 
+                               onchange="updateSize(this.value)" 
+                               style="width: 100%; margin-bottom: 1rem;">
+                        
+                        <button class="tool-btn" onclick="clearScene()" style="width: 100%; background: rgba(255, 0, 0, 0.3);">
+                            🗑️ Clear All
+                        </button>
+                    </div>
+                </div>
+
+                <div class="viewport">
+                    <canvas id="gameCanvas"></canvas>
+                    <div class="controls-hint">
+                        🖱️ Click to place blocks<br>
+                        🎯 Right-click to delete<br>
+                        ⌨️ WASD to move camera<br>
+                        🔄 Drag to rotate view
+                    </div>
+                    <button class="play-button" onclick="playGame()">▶️ Test Play</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="games-grid" id="gamesGrid">
+            <div class="game-card" onclick="alert('Loading game...')">
+                <div class="game-thumbnail">🏰</div>
+                <div class="game-info">
+                    <div class="game-title">Castle Builder</div>
+                    <div class="game-stats">
+                        <span>👥 1.2K</span>
+                        <span>⭐ 4.8</span>
+                    </div>
+                </div>
+            </div>
+            <div class="game-card" onclick="alert('Loading game...')">
+                <div class="game-thumbnail">🏁</div>
+                <div class="game-info">
+                    <div class="game-title">Race Track</div>
+                    <div class="game-stats">
+                        <span>👥 856</span>
+                        <span>⭐ 4.5</span>
+                    </div>
+                </div>
+            </div>
+            <div class="game-card" onclick="alert('Loading game...')">
+                <div class="game-thumbnail">🌳</div>
+                <div class="game-info">
+                    <div class="game-title">Forest Adventure</div>
+                    <div class="game-stats">
+                        <span>👥 2.3K</span>
+                        <span>⭐ 4.9</span>
+                    </div>
+                </div>
+            </div>
+            <div class="game-card" onclick="alert('Loading game...')">
+                <div class="game-thumbnail">🚀</div>
+                <div class="game-info">
+                    <div class="game-title">Space Station</div>
+                    <div class="game-stats">
+                        <span>👥 945</span>
+                        <span>⭐ 4.6</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="game-engine.js"></script>
+</body>
+</html>
